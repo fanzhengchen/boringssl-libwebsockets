@@ -8,13 +8,7 @@ include_directories(${PROJECT_SOURCE_DIR}/libwebsockets/include)
 
 set(lib_dir ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI})
 
-add_library( # Sets the name of the library.
-             native-lib
 
-             SHARED
-             register.h
-             register.cpp
-             native-lib.cpp )
 
 
 find_library( # Sets the name of the path variable.
@@ -30,12 +24,8 @@ set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${lib_dir}/libcrypto.a
 add_library(websockets STATIC IMPORTED)
 set_target_properties(websockets PROPERTIES IMPORTED_LOCATION ${lib_dir}/libwebsockets.a)
 
-target_link_libraries( # Specifies the target library.
-                       native-lib
+add_library(native-lib SHARED register.h register.cpp native-lib.cpp )
+target_link_libraries(native-lib ssl crypto websockets log)
 
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ssl
-                       crypto
-                       websockets
-                       ${log-lib} )
+add_library(websocket SHARED websocket.h websocket.cpp register.cpp register.h)
+target_link_libraries(websocket ssl crypto websockets log)
