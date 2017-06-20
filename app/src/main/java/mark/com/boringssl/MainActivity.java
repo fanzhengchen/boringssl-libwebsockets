@@ -18,11 +18,11 @@ public class MainActivity extends AppCompatActivity {
     Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
-            mWebsocket.setAddress("172.16.14.115", 20000, "/WebSocket");
+//            mWebsocket.setAddress("172.16.14.115", 20000, "/WebSocket");
         }
     });
 
-    WebSocket mWebsocket = new WebSocket();
+//    WebSocket mWebsocket = new WebSocket();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
