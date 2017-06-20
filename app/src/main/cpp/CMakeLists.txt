@@ -20,8 +20,8 @@ set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${lib_dir}/libcrypto.a
 add_library(websockets SHARED IMPORTED)
 set_target_properties(websockets PROPERTIES IMPORTED_LOCATION ${lib_dir}/libwebsockets.so)
 
-add_library(native-lib SHARED register.h register.cpp native-lib.cpp )
-target_link_libraries(native-lib ssl crypto websockets log)
+add_library(native SHARED register.h register.cpp native.cpp native.h)
+target_link_libraries(native ssl crypto websockets log)
 
 #add_library(websocket SHARED websocket.h websocket.cpp register.cpp register.h)
 #target_link_libraries(websocket ssl crypto websockets log)

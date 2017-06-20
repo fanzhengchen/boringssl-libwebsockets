@@ -10,19 +10,27 @@ import com.example.WebSocket;
 public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
 
 
+    JNI mJNI = new JNI();
+
+    Object lock = new Object();
     Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
-//            mWebsocket.setAddress("172.16.14.115", 20000, "/WebSocket");
+            mJNI.connect();
+
+            while (true) {
+                try {
+                    mJNI.serviceWebSockets();
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     });
 
-//    WebSocket mWebsocket = new WebSocket();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +43,10 @@ public class MainActivity extends AppCompatActivity {
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                thread.run();
             }
         });
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
 
 }

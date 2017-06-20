@@ -143,9 +143,6 @@ JNIEXPORT void JNICALL jni_connect
 
 //    LOGV("%d", wsi);
     if (wsi == NULL) {
-        // Error
-//        emit_log(LLL_ERR, "Protocol failed to connect.");
-//        return JNI_FALSE;
     }
 };
 
