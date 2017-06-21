@@ -31,13 +31,22 @@ JNIEXPORT void JNICALL JNI_connect
  */
 JNIEXPORT void JNICALL JNI_serviceWebSockets
         (JNIEnv *, jobject);
+
+/*
+ * Class:     mark_com_boringssl_JNI
+ * Method:    close
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL JNI_close
+        (JNIEnv *, jobject);
 #ifdef __cplusplus
 }
 
 static JNINativeMethod jni_native_methods[] = {
         {"stringFromJni",     "()Ljava/lang/String;", (void *) JNI_stringFromJni},
         {"connect",           "()V",                  (void *) JNI_connect},
-        {"serviceWebSockets", "()V",                  (void *) JNI_serviceWebSockets}
+        {"serviceWebSockets", "()V",                  (void *) JNI_serviceWebSockets},
+        {"close",             "()V",                  (void *) JNI_close}
 };
 #endif
 #endif

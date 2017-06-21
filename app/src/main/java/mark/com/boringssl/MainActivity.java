@@ -13,23 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     JNI mJNI = new JNI();
-
-    Object lock = new Object();
-    Thread thread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            mJNI.connect();
-
-            while (true) {
-                try {
-                    mJNI.serviceWebSockets();
-                    Thread.sleep(100);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    });
+    Task mTask = new Task();
 
 
     @Override
@@ -43,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                thread.run();
+                new Task().execute(mJNI);
             }
         });
     }

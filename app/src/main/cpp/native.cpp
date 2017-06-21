@@ -16,21 +16,48 @@ lws_context_creation_info creation_info;
 lws_context *context = NULL;
 lws *wsi = NULL;
 
+u_int8_t buf[BUFFER_SIZE];
+size_t len;
+
+
+void LOG(int level, const char *line) {
+    LOGV("%s", line);
+}
+
 struct per_session_data {
     int data;
 };
 
 static int
 callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len) {
-    LOGV("callback invoke %d", reason);
+//    LOGV("callback invoke %d %s %d", reason, (const char *) in, len);
+
+    switch (reason) {
+        case LWS_CALLBACK_CLIENT_ESTABLISHED: {
+            LOGV("%d client established", __LINE__);
+        };
+        case LWS_CALLBACK_CLIENT_WRITEABLE: {
+            LOGV("%d client writable", __LINE__);
+            char *message = (char *) buf;
+            sprintf(message, "libwebsocket text message");
+            LOGV("%d send message:\r\n %s", __LINE__, message);
+            len = strlen(message);
+            message[0] = 0;
+            lws_write(wsi, buf, len, LWS_WRITE_TEXT);
+        };
+        case LWS_CALLBACK_RECEIVE_PONG: {
+            LOGV("%d receive pong", __LINE__);
+        };
+        case LWS_CALLBACK_CLOSED: {
+            LOGV("%d handshake close", __LINE__);
+        };
+        case LWS_CALLBACK_GET_THREAD_ID: {
+//            LOGV("%d get thread id", __LINE__);
+        }
+    }
     return 0;
 }
 
-static int
-callback2(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len) {
-    LOGV("callback2 invoke %d", reason);
-    return 0;
-}
 
 enum websocket_protocols {
     PROTOCOL_DUMP_INCREMENT = 0,
@@ -39,7 +66,6 @@ enum websocket_protocols {
 
 const lws_protocols protocols[] = {
         {"dump-increment-protocol", callback, sizeof(per_session_data), BUFFER_SIZE},
-        {"http",                    callback2, sizeof(per_session_data), BUFFER_SIZE},
         {NULL, NULL,                          0, 0}
 };
 
@@ -54,6 +80,7 @@ void init() {
     info.port = CONTEXT_PORT_NO_LISTEN;
     info.protocols = protocols;
     info.extensions = exts;
+    info.ws_ping_pong_interval = 5;
     info.gid = -1;
     info.uid = -1;
     context = lws_create_context(&info);
@@ -79,7 +106,6 @@ JNIEXPORT void JNICALL JNI_serviceWebSockets
 extern "C"
 JNIEXPORT void JNICALL JNI_connect
         (JNIEnv *, jobject) {
-
 //    gJvm->AttachCurrentThread(&gEnv, NULL);
     init();
     lws_client_connect_info info;
@@ -87,25 +113,35 @@ JNIEXPORT void JNICALL JNI_connect
 
     info.port = 20000;
     info.address = "172.16.14.115";
-    info.path = "/WebSocket";
+    info.path = "/webSocket";
     info.context = context;
 
     info.ssl_connection = 0;
-    info.host = "172.16.14.115";
+    info.host = "172.16.14.15";
+
+
+    LOGV("%d %s", __LINE__, info.host);
     info.origin = "172.16.14.115";
 
     info.ietf_version_or_minus_one = -1;
     info.client_exts = exts;
-    info.protocol = protocols[1].name;
+    info.protocol = protocols[0].name;
+
 
     wsi = lws_client_connect_via_info(&info);
 
-    if (wsi == NULL) {
+
+    lws_set_log_level(LLL_INFO, LOG);
+    if (wsi) {
         LOGV("connected");
     } else {
         LOGV("not connected");
     }
-//    gJvm->DetachCurrentThread();
+
+    while (true) {
+        lws_service(context, 0);
+    }
+
 }
 
 

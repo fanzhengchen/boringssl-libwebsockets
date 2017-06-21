@@ -19,4 +19,6 @@ public class JNI {
     public native void connect();
 
     public native void serviceWebSockets();
+
+    public native void close();
 }
